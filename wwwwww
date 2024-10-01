@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Sandbox with Three.js</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            background: #87CEEB; /* Light blue sky */
+        }
+        canvas {
+            display: block; /* Remove any default margin or padding */
+        }
+        #info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    <div id="info">Use WASD to move, Mouse to look around</div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Create the scene
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Add a basic ground plane
+        const planeGeometry = new THREE.PlaneGeometry(100, 100);
+        const planeMaterial = new THREE.MeshBasicMaterial({ color: 0x228B22, side: THREE.DoubleSide });
+        const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+        plane.rotation.x = - Math.PI / 2; // Rotate the plane
+        scene.add(plane);
+
+        // Add a box
+        const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
+        const cubeMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+        const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+        cube.position.y = 0.5; // Position the cube above the ground
+        scene.add(cube);
+
+        // Set camera position
+        camera.position.z = 5;
+
+        // Add ambient light
+        const ambientLight = new THREE.AmbientLight(0xffffff);
+        scene.add(ambientLight);
+
+        // Add directional light
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+        scene.add(directionalLight);
+
+        // Movement controls
+        const keyboard = {};
+        window.addEventListener('keydown', (e) => { keyboard[e.code] = true; });
+        window.addEventListener('keyup', (e) => { keyboard[e.code] = false; });
+
+        const clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const delta = clock.getDelta(); // seconds.
+            if (keyboard['KeyW']) camera.position.z -= 5 * delta; // Move forward
+            if (keyboard['KeyS']) camera.position.z += 5 * delta; // Move backward
+            if (keyboard['KeyA']) camera.position.x -= 5 * delta; // Move left
+            if (keyboard['KeyD']) camera.position.x += 5 * delta; // Move right
+
+            renderer.render(scene, camera);
+        }
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate(); // Start the animation loop
+    </script>
+</body>
+</html>
